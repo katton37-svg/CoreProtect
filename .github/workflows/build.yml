@@ -1,4 +1,4 @@
-name: Build v24
+name: Build v24 Fix
 on:
   workflow_dispatch:
 jobs:
@@ -11,10 +11,12 @@ jobs:
         with:
           java-version: '25'
           distribution: 'oracle'
-      - name: Build with Maven
-        run: mvn -B package -DskipTests
+      - name: Build
+        # "shade:shade" を追加して、バラバラの部品をすべて強制合体させます
+        run: mvn -B install shade:shade -DskipTests
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: CoreProtect-v24
-          path: "**/target/*.jar"
+          name: CoreProtect-v24-Final
+          # 一番ファイルサイズが大きい（通常5MB以上）ものが完成品です
+          path: "**/target/CoreProtect-*.jar"
