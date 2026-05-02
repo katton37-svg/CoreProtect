@@ -11,10 +11,12 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Build with Maven (Force Stable API)
+      - name: Fix Broken Dependencies
         run: |
-          mvn -B package -DskipTests \
-          -Dpaper.api.version=1.21.1-R0.1-SNAPSHOT
+          # 壊れた alpha バージョンを 1.21.1 の安定版に強制置換
+          sed -i 's/26.1.2.build.9-alpha/1.21.1-R0.1-SNAPSHOT/g' pom.xml
+      - name: Build
+        run: mvn -B package -DskipTests
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
