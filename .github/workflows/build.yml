@@ -20,4 +20,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: CoreProtect-v24
-          path: target/*.jar
+          path: **/target/*.jar
