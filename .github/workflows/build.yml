@@ -1,4 +1,4 @@
-name: Build
+name: Build v24 (Java 25)
 on:
   workflow_dispatch:
 jobs:
@@ -6,19 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+      - name: Set up JDK 25 (Early Access)
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      - name: Fix Broken Dependencies
-        run: |
-          # 壊れた alpha バージョンを 1.21.1 の安定版に強制置換
-          sed -i 's/26.1.2.build.9-alpha/1.21.1-R0.1-SNAPSHOT/g' pom.xml
-      - name: Build
+          java-version: '25-ea' # Java 25の早期アクセス版を指定
+          distribution: 'oracle' # Oracle JDKなら最新版が提供されています
+      - name: Build with Maven
         run: mvn -B package -DskipTests
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: CoreProtect-Jar
+          name: CoreProtect-v24-Java25
           path: target/*.jar
