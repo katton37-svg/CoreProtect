@@ -7,21 +7,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install Java 25
-        run: |
-          # 接続先をミラーサイトに変更
-          curl -L "https://github.com" -o jdk.tar.gz || \
-          curl -L "https://java.net" -o jdk.tar.gz
-          
-          tar -xzf jdk.tar.gz
-          # フォルダ名を確認してパスを通す
-          JDK_DIR=$(ls -d jdk-25* | head -n 1)
-          echo "JAVA_HOME=$GITHUB_WORKSPACE/$JDK_DIR" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/$JDK_DIR/bin" >> $GITHUB_PATH
-
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'oracle' # Oracleが提供する最新のEA版を自動で取得します
+      
       - name: Build with Maven
-        run: |
-          mvn -B package -DskipTests
+        run: mvn -B package -DskipTests
 
       - name: Upload
         uses: actions/upload-artifact@v4
