@@ -9,17 +9,18 @@ jobs:
       
       - name: Install Java 25
         run: |
-          # Java 25 (Early Access) を直接ダウンロード
-          wget https://java.net
-          tar -xzf openjdk-25-ea+12_linux-x64_bin.tar.gz
-          # パスを強制的に上書き
-          echo "JAVA_HOME=$GITHUB_WORKSPACE/jdk-25" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/jdk-25/bin" >> $GITHUB_PATH
+          # 接続先をミラーサイトに変更
+          curl -L "https://github.com" -o jdk.tar.gz || \
+          curl -L "https://java.net" -o jdk.tar.gz
+          
+          tar -xzf jdk.tar.gz
+          # フォルダ名を確認してパスを通す
+          JDK_DIR=$(ls -d jdk-25* | head -n 1)
+          echo "JAVA_HOME=$GITHUB_WORKSPACE/$JDK_DIR" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/$JDK_DIR/bin" >> $GITHUB_PATH
 
       - name: Build with Maven
         run: |
-          # Javaバージョンを確認してからビルド
-          java -version
           mvn -B package -DskipTests
 
       - name: Upload
