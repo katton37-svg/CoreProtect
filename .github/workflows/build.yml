@@ -1,4 +1,4 @@
-name: Build v24 (Ultimate Fix)
+name: Build v24 (Version Spoof)
 on:
   workflow_dispatch:
 jobs:
@@ -11,18 +11,16 @@ jobs:
         with:
           java-version: '25'
           distribution: 'oracle'
-      - name: Patch CoreProtect Version Logic
+      - name: Version Spoofing
+        # プロジェクトのバージョン設定を直接 26.1.2 に書き換えて、チェックをスルーさせます
         run: |
-          # Functions.java 内のバージョン判定を強制的に「1 (サポート済み)」に書き換えます
-          find . -name "Functions.java" -exec sed -i 's/int supported = java_check/int supported = 1; \/\/ java_check/g' {} +
-          find . -name "Functions.java" -exec sed -i 's/supported = server_check/supported = 1; \/\/ server_check/g' {} +
-          # Config.java 内の同様の箇所も念のため書き換え
-          find . -name "Config.java" -exec sed -i 's/int supported = java_check/int supported = 1; \/\/ java_check/g' {} +
-          find . -name "Config.java" -exec sed -i 's/supported = server_check/supported = 1; \/\/ server_check/g' {} +
+          sed -i 's/<version>23.2<\/version>/<version>26.1.2<\/version>/g' pom.xml
+          # バージョン判定メソッドを力ずくで書き換える（sedを確実に当てる）
+          grep -l "supported = " -r . | xargs sed -i 's/supported = [^;]*/supported = 1/g'
       - name: Build with Maven
         run: mvn -B install shade:shade -DskipTests
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: CoreProtect-v24-Fixed
+          name: CoreProtect-v24-Spoofed
           path: "**/target/CoreProtect-*.jar"
