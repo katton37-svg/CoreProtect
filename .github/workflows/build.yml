@@ -1,4 +1,4 @@
-name: Build v24 (Version Fix Final)
+name: Build v24 (Ultimate Fix)
 on:
   workflow_dispatch:
 jobs:
@@ -11,9 +11,12 @@ jobs:
         with:
           java-version: '25'
           distribution: 'oracle'
-      - name: Patch CoreProtect Version Check
-        # バージョン判定メソッドそのものを「常にtrue（サポート済み）」を返すように強制書き換えします
+      - name: Patch CoreProtect Version Logic
         run: |
+          # Functions.java 内のバージョン判定を強制的に「1 (サポート済み)」に書き換えます
+          find . -name "Functions.java" -exec sed -i 's/int supported = java_check/int supported = 1; \/\/ java_check/g' {} +
+          find . -name "Functions.java" -exec sed -i 's/supported = server_check/supported = 1; \/\/ server_check/g' {} +
+          # Config.java 内の同様の箇所も念のため書き換え
           find . -name "Config.java" -exec sed -i 's/int supported = java_check/int supported = 1; \/\/ java_check/g' {} +
           find . -name "Config.java" -exec sed -i 's/supported = server_check/supported = 1; \/\/ server_check/g' {} +
       - name: Build with Maven
