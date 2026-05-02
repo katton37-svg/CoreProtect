@@ -1,4 +1,4 @@
-name: Build v24 (No Version Limit)
+name: Build v24 (Version Fix Final)
 on:
   workflow_dispatch:
 jobs:
@@ -11,15 +11,15 @@ jobs:
         with:
           java-version: '25'
           distribution: 'oracle'
-      - name: Patch Version Check
-        # バージョンチェックを行っている箇所を強制的に「常にtrue（許可）」に書き換えます
+      - name: Patch CoreProtect Version Check
+        # バージョン判定メソッドそのものを「常にtrue（サポート済み）」を返すように強制書き換えします
         run: |
-          find . -name "*.java" -exec sed -i 's/if (supported == 0)/if (false)/g' {} +
-          find . -name "*.java" -exec sed -i 's/if (supported == -1)/if (false)/g' {} +
+          find . -name "Config.java" -exec sed -i 's/int supported = java_check/int supported = 1; \/\/ java_check/g' {} +
+          find . -name "Config.java" -exec sed -i 's/supported = server_check/supported = 1; \/\/ server_check/g' {} +
       - name: Build with Maven
         run: mvn -B install shade:shade -DskipTests
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: CoreProtect-v24-Patched
+          name: CoreProtect-v24-Fixed
           path: "**/target/CoreProtect-*.jar"
